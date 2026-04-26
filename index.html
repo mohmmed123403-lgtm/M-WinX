@@ -1,12 +1,43 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M-Core Browser</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial; background: #0a0a0a; color: white; height: 100vh; display: flex; flex-direction: column; }
-       .header { background: #1a1a1a; padding: 10px; text-align: center; font-size: 20px; font-weight: bold; border-bottom: 2px solid #333; }
-       .search-bar { background: #1a1a1a; padding: 10px; display: flex; gap: 10px; border-bottom: 2px solid #333; }
-       .search-bar input { flex: 1; padding: 12
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>M-Core</title>
+<style>
+body{margin:0;background:#000;color:#fff;font-family:Arial}
+.bar{display:flex;padding:10px;gap:10px;background:#111}
+input{flex:1;padding:10px;border:none;border-radius:5px;background:#222;color:#fff}
+button{padding:10px 15px;border:none;border-radius:5px;background:#0070f3;color:#fff}
+.tabs{display:flex;gap:5px;padding:5px;background:#111;overflow:auto}
+.tab{background:#222;border:none;color:#fff;padding:8px 15px;border-radius:5px}
+iframe{width:100%;height:calc(100vh - 110px);border:none;background:#fff}
+</style>
+</head>
+<body>
+<div class="bar">
+<input id="url" placeholder="اكتب الموقع هنا..." onkeydown="if(event.key=='Enter')go()">
+<button onclick="go()">افتح</button>
+</div>
+<div class="tabs">
+<button class="tab" onclick="openUrl('https://youtube.com')">YouTube</button>
+<button class="tab" onclick="openUrl('https://google.com')">Google</button>
+<button class="tab" onclick="openUrl('https://tiktok.com')">TikTok</button>
+</div>
+<iframe id="frame"></iframe>
+<script>
+const server='https://m-core-server.vercel.app';
+function go(){
+let u=document.getElementById('url').value;
+if(!u)return;
+if(!u.includes('.'))u='https://google.com/search?q='+encodeURIComponent(u);
+else if(!u.startsWith('http'))u='https://'+u;
+openUrl(u)
+}
+function openUrl(u){
+document.getElementById('frame').src=server+'/browse?url='+encodeURIComponent(u);
+document.getElementById('url').value=u;
+}
+</script>
+</body>
+</html>
