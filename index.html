@@ -35,7 +35,13 @@ else if(!u.startsWith('http'))u='https://'+u;
 openUrl(u)
 }
 function openUrl(u){
-document.getElementById('frame').src=server+'/browse?url='+encodeURIComponent(u);
+const blockedSites = ['youtube.com', 'google.com', 'tiktok.com', 'facebook.com', 'github.com', 'twitter.com', 'x.com'];
+
+if(blockedSites.some(site => u.includes(site))){
+    window.open(server+'/browse?url='+encodeURIComponent(u), '_blank')
+} else {
+    document.getElementById('frame').src=server+'/browse?url='+encodeURIComponent(u)
+}
 document.getElementById('url').value=u;
 }
 </script>
