@@ -3,390 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M-Core Browser</title>
+    <title>متصفح الإمبراطور</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma; }
-        body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
-.top-bar { background: #0a0a0a; padding: 8px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1a1a1a; }
-.go-btn { background: #00c853; color: #000; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-.url-container { flex: 1; position: relative; }
-.url-bar { width: 100%; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 8px 12px; color: #fff; outline: none; font-size: 14px; }
-.suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #0a0a0a; border: 1px solid #333; border-top: none; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; display: none; z-index: 999; }
-.suggestion-item { padding: 10px 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #1a1a1a; }
-.suggestion-item:hover { background: #1a1a1a; color: #00ff41; }
-.nav-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px; }
-.menu-btn { background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 0 8px; }
-.main { height: calc(100vh - 108px); overflow-y: auto; text-align: center; padding: 20px; }
-.logo-globe { width: 70px; height: 70px; margin: 15px auto; }
-.logo-globe svg { width: 100%; height: 100%; filter: drop-shadow(0 0 10px #00c853); }
-.title { color: #00ff41; font-size: 28px; font-weight: 900; margin: 15px 0; text-shadow: 0 0 20px #00ff41; }
-.search-container { max-width: 500px; margin: 25px auto; position: relative; }
-.search-box { width: 100%; background: #1a1a1a; border: 2px solid #333; border-radius: 30px; padding: 14px 50px; color: #fff; font-size: 15px; outline: none; }
-.search-box:focus { border-color: #00c853; box-shadow: 0 0 15px rgba(0,200,83,0.3); }
-.search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; }
-.mic-icon { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; cursor: pointer; }
-.mic-icon.listening { animation: pulse 1.5s infinite; color: #da3633; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-.search-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #0a0a0a; border: 2px solid #00c853; border-top: none; border-radius: 0 0 20px 20px; max-height: 250px; overflow-y: auto; display: none; z-index: 999; }
-.shortcuts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 450px; margin: 30px auto; }
-.shortcut { background: #1a1a1a; border: 1px solid #333; border-radius: 16px; padding: 16px 8px; cursor: pointer; transition: 0.3s; }
-.shortcut:hover { background: #222; border-color: #00c853; transform: translateY(-3px); }
-.shortcut-icon { font-size: 28px; margin-bottom: 6px; }
-.shortcut-name { font-size: 13px; color: #ccc; }
-.news-section { max-width: 500px; margin: 30px auto; text-align: right; }
-.news-title { color: #00ff41; font-size: 17px; margin-bottom: 12px; font-weight: bold; }
-.news-card { background: #1a1a1a; border: 1px solid #333; border-radius: 16px; padding: 16px; text-align: right; }
-.news-card h3 { color: #fff; font-size: 15px; margin-bottom: 6px; }
-.news-card p { color: #888; font-size: 13px; }
-        #frame { display: none; width: 100%; height: calc(100vh - 108px); border: none; background: #000; }
-.history { background: #0a0a0a; height: 58px; overflow-x: auto; white-space: nowrap; padding: 8px; border-top: 1px solid #1a1a1a; display: flex; align-items: center; gap: 8px; position: fixed; bottom: 0; width: 100%; }
-.history-label { opacity: 0.6; font-size: 12px; margin-left: 5px; flex-shrink: 0; }
-.history-item { display: inline-block; background: #1a1a1a; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; border: 1px solid #333; flex-shrink: 0; }
-.history-item:hover { background: #222; border-color: #00c853; }
-.clear-history { background: #da3633; border: none; color: white; padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 11px; margin-right: auto; flex-shrink: 0; }
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
-.modal-content { background: #0a0a0a; margin: 60px auto; padding: 0; width: 90%; max-width: 400px; border-radius: 20px; border: 2px solid #00c853; max-height: 80vh; overflow-y: auto; }
-.modal-header { padding: 18px; border-bottom: 1px solid #333; position: sticky; top: 0; background: #0a0a0a; display: flex; justify-content: space-between; align-items: center; }
-.modal-header h2 { color: #00ff41; font-size: 18px; }
-.back-btn { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; }
-.modal-body { padding: 15px; }
-.setting-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #1a1a1a; }
-.setting-item.clickable { cursor: pointer; }
-.setting-item.clickable:hover { background: #1a1a1a; margin: 0 -15px; padding: 16px 15px; }
-.setting-info { flex: 1; text-align: right; }
-.setting-title { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
-.setting-desc { font-size: 11px; opacity: 0.6; }
-.switch { position: relative; width: 48px; height: 26px; flex-shrink: 0; }
-.switch input { opacity: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #333; transition:.3s; border-radius: 26px; }
-.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background: white; transition:.3s; border-radius: 50%; }
-        input:checked +.slider { background: #00c853; }
-        input:checked +.slider:before { transform: translateX(22px); }
-.close-btn { background: #00c853; border: none; color: #000; padding: 12px; border-radius: 10px; cursor: pointer; width: calc(100% - 30px); font-weight: bold; margin: 15px; }
-.perm-list { padding: 10px 0; }
-.perm-item { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
-.perm-site { font-size: 13px; color: #00ff41; margin-bottom: 8px; }
-.perm-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; }
-.perm-allowed { color: #00c853; }
-.perm-blocked { color: #da3633; }
-.toast { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); background: #0a0a0a; border: 1px solid #00c853; padding: 12px 18px; border-radius: 12px; display: none; z-index: 2000; box-shadow: 0 5px 20px rgba(0,200,83,0.3); font-size: 14px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { background: #0f0f1e; color: #fff; overflow: hidden; }
+        #homePage { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
+       .logo { font-size: 3rem; margin-bottom: 30px; background: linear-gradient(45deg, #00f5a0, #00d9f5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
+       .search-container { width: 100%; max-width: 600px; position: relative; }
+       .search-box { width: 100%; padding: 15px 20px; border-radius: 50px; border: 2px solid #00f5a0; background: #1a1a2e; color: #fff; font-size: 1.1rem; outline: none; }
+       .search-box:focus { border-color: #00d9f5; box-shadow: 0 0 20px rgba(0, 217, 245, 0.3); }
+       .suggestions { position: absolute; top: 60px; width: 100%; background: #1a1a2e; border-radius: 15px; max-height: 300px; overflow-y: auto; display: none; z-index: 100; }
+       .suggestion-item { padding: 12px 20px; cursor: pointer; border-bottom: 1px solid #2a2a3e; }
+       .suggestion-item:hover { background: #2a2a3e; }
+        #browserPage { display: none; height: 100vh; flex-direction: column; }
+       .url-bar-container { display: flex; padding: 10px; background: #1a1a2e; gap: 10px; align-items: center; }
+       .nav-btn { background: #2a2a3e; border: none; color: #00f5a0; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-size: 1.2rem; }
+       .nav-btn:hover { background: #3a3a4e; }
+        #urlBar { flex: 1; padding: 10px 15px; border-radius: 10px; border: 1px solid #2a2a3e; background: #0f0f1e; color: #fff; outline: none; }
+        #frame { width: 100%; height: 100%; border: none; flex: 1; background: #fff; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #00f5a0; color: #0f0f1e; padding: 12px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 9999; }
+       .home-btn { position: fixed; bottom: 20px; right: 20px; background: #00f5a0; color: #0f0f1e; width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 1.5rem; cursor: pointer; z-index: 1000; box-shadow: 0 5px 20px rgba(0, 245, 160, 0.4); }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <button class="go-btn" onclick="load()">Go</button>
-        <div class="url-container">
-            <input type="text" class="url-bar" id="urlBar" placeholder="github.com" oninput="showUrlSuggestions()" onblur="setTimeout(()=>hideUrlSuggestions(), 200)">
-            <div class="suggestions" id="urlSuggestions"></div>
-        </div>
-        <button class="nav-btn" onclick="goHome()">🏠</button>
-        <button class="nav-btn" onclick="goForward()">▶</button>
-        <button class="nav-btn" onclick="goBack()">◀</button>
-        <button class="menu-btn" onclick="openSettings()">⋮</button>
-    </div>
-
-    <div class="main" id="homePage">
-        <div class="logo-globe">
-            <svg viewBox="0 0 100 100" fill="none">
-                <circle cx="50" cy="50" r="45" stroke="#00c853" stroke-width="3"/>
-                <path d="M50 5 L50 95 M5 50 L95 50 M15 15 Q50 30 85 15 M15 85 Q50 70 85 85" stroke="#00c853" stroke-width="2" fill="none"/>
-                <ellipse cx="50" cy="50" rx="45" ry="20" stroke="#00c853" stroke-width="2" fill="none"/>
-            </svg>
-        </div>
-        <h1 class="title">M-Core Browser</h1>
+    <div id="homePage">
+        <div class="logo">متصفح الإمبراطور ⚡</div>
         <div class="search-container">
-            <span class="mic-icon" id="micIcon" onclick="requestMic()">🎤</span>
-            <input type="text" class="search-box" id="searchInput" placeholder="ابحث في M-Core أو اكتب عنوان..." oninput="showSearchSuggestions()" onkeypress="if(event.key==='Enter') searchGo()" onblur="setTimeout(()=>hideSearchSuggestions(), 200)">
-            <span class="search-icon">🔍</span>
-            <div class="search-suggestions" id="searchSuggestions"></div>
-        </div>
-        <div class="shortcuts">
-            <div class="shortcut" onclick="openQuick('https://v86.github.io')">
-                <div class="shortcut-icon">💾</div>
-                <div class="shortcut-name">v86</div>
-            </div>
-            <div class="shortcut" onclick="openQuick('https://youtube.com')">
-                <div class="shortcut-icon">▶️</div>
-                <div class="shortcut-name">YouTube</div>
-            </div>
-            <div class="shortcut" onclick="openQuick('https://github.com')">
-                <div class="shortcut-icon">💻</div>
-                <div class="shortcut-name">GitHub</div>
-            </div>
-            <div class="shortcut" onclick="openQuick('https://news.google.com')">
-                <div class="shortcut-icon">📰</div>
-                <div class="shortcut-name">أخبار</div>
-            </div>
-        </div>
-        <div class="news-section">
-            <div class="news-title">آخر الأخبار من M-Core</div>
-            <div class="news-card">
-                <h3>إطلاق M-Core Browser v2.0</h3>
-                <p>أول متصفح عربي يدعم محاكاة الأنظمة</p>
-            </div>
+            <input type="text" class="search-box" id="searchInput" placeholder="ابحث في Bing أو اكتب عنوان..." oninput="showSearchSuggestions()" onkeypress="if(event.key==='Enter') searchGo()">
+            <div class="suggestions" id="searchSuggestions"></div>
         </div>
     </div>
 
-    <iframe id="frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads allow-modals" allow="microphone; camera; geolocation"></iframe>
-
-    <div class="history" id="history">
-        <span class="history-label">السجل:</span>
-        <button class="clear-history" onclick="clearHistory()">مسح</button>
-    </div>
-
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="settingsTitle">إعدادات M-Core Browser</h2>
-                <button class="back-btn" id="backBtn" onclick="backToMainSettings()" style="display:none;">← رجوع</button>
-            </div>
-            <div class="modal-body" id="settingsBody">
-                <div id="mainSettings">
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <div class="setting-title">وضع زيادة السرعة ⚡</div>
-                            <div class="setting-desc">تسريع التصفح والتحميل لأقصى درجة</div>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="speedMode">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <div class="setting-title">وضع الأهل 🔒</div>
-                            <div class="setting-desc">حظر المواقع غير المناسبة تلقائياً</div>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="parentalMode">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <div class="setting-title">تصحيح الأخطاء الإملائية ✍️</div>
-                            <div class="setting-desc">يصلح الكلمات الغلط تلقائياً</div>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="autoCorrect" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item clickable" onclick="openSiteSettings()">
-                        <div class="setting-info">
-                            <div class="setting-title">إعدادات الموقع الإلكتروني</div>
-                            <div class="setting-desc">إدارة الكوكيز والتخزين لكل موقع</div>
-                        </div>
-                        <span style="opacity: 0.7;">→</span>
-                    </div>
-                    <div class="setting-item clickable" onclick="openPermissions()">
-                        <div class="setting-info">
-                            <div class="setting-title">أذونات المواقع</div>
-                            <div class="setting-desc">الكاميرا، المايك، الموقع، الإشعارات</div>
-                        </div>
-                        <span style="opacity: 0.7;">→</span>
-                    </div>
-                </div>
-
-                <div id="siteSettings" style="display:none;">
-                    <div class="perm-item">
-                        <div class="perm-site">جميع المواقع</div>
-                        <div class="perm-row">
-                            <span>الكوكيز</span>
-                            <span class="perm-allowed">مسموح ✓</span>
-                        </div>
-                        <div class="perm-row">
-                            <span>التخزين المحلي</span>
-                            <span class="perm-allowed">مسموح ✓</span>
-                        </div>
-                        <div class="perm-row">
-                            <span>JavaScript</span>
-                            <span class="perm-allowed">مسموح ✓</span>
-                        </div>
-                    </div>
-                    <p style="opacity:0.6;font-size:11px;text-align:center;margin-top:15px;">يتم إدارة إعدادات كل موقع تلقائياً عبر M-Core Server</p>
-                </div>
-
-                <div id="permissionsSettings" style="display:none;">
-                    <div class="perm-list" id="permList"></div>
-                    <p style="opacity:0.6;font-size:11px;text-align:center;margin-top:10px;">اضغط على المايك 🎤 أو أي موقع يطلب إذن للسماح</p>
-                </div>
-            </div>
-            <button class="close-btn" onclick="closeSettings()">حفظ وإغلاق</button>
+    <div id="browserPage">
+        <div class="url-bar-container">
+            <button class="nav-btn" onclick="goBack()">←</button>
+            <button class="nav-btn" onclick="goForward()">→</button>
+            <button class="nav-btn" onclick="reloadPage()">⟳</button>
+            <input type="text" id="urlBar" onkeypress="if(event.key==='Enter') goToUrl(this.value)">
+            <button class="nav-btn" onclick="goHome()">🏠</button>
         </div>
+        <iframe id="frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
     </div>
 
-    <div id="permToast" class="toast"></div>
+    <button class="home-btn" onclick="goHome()">🏠</button>
+    <div id="toast"></div>
 
     <script>
-        const server = 'https://9056037b037c39.lhr.life';
-        const blockedSites = ['youtube.com', 'google.com', 'tiktok.com', 'facebook.com', 'github.com', 'twitter.com', 'x.com', 'instagram.com'];
-        const adultSites = ['porn', 'xxx', 'sex', 'adult', 'pornhub', 'xvideos'];
+        let historyStack = [];
+        let historyIndex = -1;
+        let adultSites = ['porn', 'xxx', 'sex'];
 
-        const commonSearches = [
-            'youtube.com', 'google.com', 'facebook.com', 'github.com', 'twitter.com',
-            'instagram.com', 'tiktok.com', 'wikipedia.org', 'amazon.com', 'netflix.com',
-            'v86.github.io', 'news.google.com', 'yahoo.com', 'reddit.com', 'whatsapp.com'
-        ];
-
-        const typoFixes = {
-            'yotube': 'youtube', 'youtub': 'youtube', 'youtoub': 'youtube',
-            'gogle': 'google', 'googel': 'google', 'gogel': 'google',
-            'facbook': 'facebook', 'facebok': 'facebook', 'fecebook': 'facebook',
-            'githup': 'github', 'githab': 'github', 'githob': 'github',
-            'twiter': 'twitter', 'twiter': 'twitter', 'tweeter': 'twitter',
-            'instgram': 'instagram', 'instagrm': 'instagram', 'insta': 'instagram',
-            'tiktak': 'tiktok', 'tik tok': 'tiktok', 'tiktuk': 'tiktok'
-        };
-
-        let currentSettingsPage = 'main';
-        let recognition = null;
-        let isListening = false;
-
-        function fixTypos(text) {
-            if(localStorage.getItem('autoCorrect')!== 'false') {
-                let fixed = text.toLowerCase();
-                for(let typo in typoFixes) {
-                    if(fixed.includes(typo)) {
-                        fixed = fixed.replace(typo, typoFixes);
-                        showToast('تم تصحيح: ' + typo + ' → ' + typoFixes);
-                    }
-                }
-                return fixed;
-            }
-            return text;
-        }
-
-        function showUrlSuggestions() {
-            const input = document.getElementById('urlBar').value.toLowerCase();
-            const suggestionsDiv = document.getElementById('urlSuggestions');
-            if(input.length < 2) {
-                suggestionsDiv.style.display = 'none';
-                return;
-            }
-
-            const history = JSON.parse(localStorage.getItem('mcore_history') || '[]');
-            const matches = [...new Set([...history,...commonSearches])].filter(s => s.toLowerCase().includes(input)).slice(0, 6);
-
-            if(matches.length === 0) {
-                suggestionsDiv.style.display = 'none';
-                return;
-            }
-
-            suggestionsDiv.innerHTML = '';
-            matches.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.textContent = s;
-                div.onclick = () => {
-                    document.getElementById('urlBar').value = s;
-                    suggestionsDiv.style.display = 'none';
-                    goToUrl(s);
-                };
-                suggestionsDiv.appendChild(div);
-            });
-            suggestionsDiv.style.display = 'block';
-        }
-
-        function hideUrlSuggestions() {
-            document.getElementById('urlSuggestions').style.display = 'none';
-        }
-
-        function showSearchSuggestions() {
-            const input = document.getElementById('searchInput').value.toLowerCase();
-            const suggestionsDiv = document.getElementById('searchSuggestions');
-            if(input.length < 2) {
-                suggestionsDiv.style.display = 'none';
-                return;
-            }
-
-            const matches = commonSearches.filter(s => s.toLowerCase().includes(input)).slice(0, 6);
-
-            if(matches.length === 0) {
-                suggestionsDiv.style.display = 'none';
-                return;
-            }
-
-            suggestionsDiv.innerHTML = '';
-            matches.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'suggestion-item';
-                div.textContent = s;
-                div.onclick = () => {
-                    document.getElementById('searchInput').value = s;
-                    suggestionsDiv.style.display = 'none';
-                    goToUrl(s);
-                };
-                suggestionsDiv.appendChild(div);
-            });
-            suggestionsDiv.style.display = 'block';
-        }
-
-        function hideSearchSuggestions() {
-            document.getElementById('searchSuggestions').style.display = 'none';
-        }
-
-        function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('mcore_history') || '[]');
-            const historyDiv = document.getElementById('history');
-            historyDiv.innerHTML = '<span class="history-label">السجل:</span><button class="clear-history" onclick="clearHistory()">مسح</button>';
-            history.slice(-20).reverse().forEach(url => {
-                const item = document.createElement('span');
-                item.className = 'history-item';
-                let displayUrl = url.replace('https://', '').replace('http://', '').split('/')[0];
-                item.textContent = displayUrl.length > 18? displayUrl.substring(0, 18) + '...' : displayUrl;
-                item.title = url;
-                item.onclick = () => { document.getElementById('urlBar').value = url; goToUrl(url); };
-                historyDiv.insertBefore(item, historyDiv.children[1]);
-            });
-        }
-
-        function clearHistory() {
-            if(confirm('مسح كل السجل؟')) {
-                localStorage.removeItem('mcore_history');
-                loadHistory();
-                showToast('تم مسح السجل');
-            }
-        }
-
-        function addHistory(url) {
-            let history = JSON.parse(localStorage.getItem('mcore_history') || '[]');
-            history = history.filter(u => u!== url);
-            history.push(url);
-            if(history.length > 100) history.shift();
-            localStorage.setItem('mcore_history', JSON.stringify(history));
-            loadHistory();
-        }
-
-        function load() {
-            let u = document.getElementById('urlBar').value.trim();
-            if (!u) return;
-            u = fixTypos(u);
-            goToUrl(u);
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
         }
 
         function searchGo() {
             let u = document.getElementById('searchInput').value.trim();
             if (!u) return;
-            u = fixTypos(u);
             goToUrl(u);
         }
 
-        function openQuick(url) {
-            document.getElementById('urlBar').value = url;
-            goToUrl(url);
-        }
-
         function goToUrl(u) {
-            hideUrlSuggestions();
             hideSearchSuggestions();
+            if (!u) return;
 
+            // لو مش رابط، ابحث في Bing
             if (!u.startsWith('http') &&!u.includes('.')) {
-                u = u;
+                u = 'https://www.bing.com/search?q=' + encodeURIComponent(u);
             } else if (!u.startsWith('http')) {
                 u = 'https://' + u;
             }
 
+            // وضع الأهل
             if(localStorage.getItem('parentalMode') === 'true') {
                 if(adultSites.some(site => u.toLowerCase().includes(site))) {
                     showToast('تم حظر هذا الموقع بواسطة وضع الأهل 🔒');
@@ -396,171 +87,78 @@
 
             addHistory(u);
             document.getElementById('homePage').style.display = 'none';
-            document.getElementById('frame').style.display = 'block';
+            document.getElementById('browserPage').style.display = 'flex';
             document.getElementById('urlBar').value = u;
 
-            document.getElementById('frame').src = server + '?url=' + encodeURIComponent(u);
-            showToast('جاري التحميل من M-Core Server... ⚡');
+            // افتح مباشر - في الـ APK هيشتغل كل المواقع
+            document.getElementById('frame').src = u;
+            showToast('جاري الفتح... ⚡');
         }
 
-        function goHome() {
-            document.getElementById('homePage').style.display = 'block';
-            document.getElementById('frame').style.display = 'none';
-            document.getElementById('urlBar').value = '';
-            document.getElementById('searchInput').value = '';
+        function addHistory(u) {
+            historyStack = historyStack.slice(0, historyIndex + 1);
+            historyStack.push(u);
+            historyIndex = historyStack.length - 1;
         }
 
         function goBack() {
-            try { document.getElementById('frame').contentWindow.history.back(); } catch(e) {}
+            if (historyIndex > 0) {
+                historyIndex--;
+                document.getElementById('frame').src = historyStack[historyIndex];
+                document.getElementById('urlBar').value = historyStack[historyIndex];
+            }
         }
 
         function goForward() {
-            try { document.getElementById('frame').contentWindow.history.forward(); } catch(e) {}
-        }
-
-        function openSettings() {
-            document.getElementById('settingsModal').style.display = 'block';
-            backToMainSettings();
-            document.getElementById('parentalMode').checked = localStorage.getItem('parentalMode') === 'true';
-            document.getElementById('speedMode').checked = localStorage.getItem('speedMode') === 'true';
-            document.getElementById('autoCorrect').checked = localStorage.getItem('autoCorrect')!== 'false';
-        }
-
-        function backToMainSettings() {
-            currentSettingsPage = 'main';
-            document.getElementById('settingsTitle').textContent = 'إعدادات M-Core Browser';
-            document.getElementById('backBtn').style.display = 'none';
-            document.getElementById('mainSettings').style.display = 'block';
-            document.getElementById('siteSettings').style.display = 'none';
-            document.getElementById('permissionsSettings').style.display = 'none';
-        }
-
-        function openSiteSettings() {
-            currentSettingsPage = 'site';
-            document.getElementById('settingsTitle').textContent = 'إعدادات الموقع الإلكتروني';
-            document.getElementById('backBtn').style.display = 'block';
-            document.getElementById('mainSettings').style.display = 'none';
-            document.getElementById('siteSettings').style.display = 'block';
-            document.getElementById('permissionsSettings').style.display = 'none';
-        }
-
-        function openPermissions() {
-            currentSettingsPage = 'permissions';
-            document.getElementById('settingsTitle').textContent = 'أذونات المواقع';
-            document.getElementById('backBtn').style.display = 'block';
-            document.getElementById('mainSettings').style.display = 'none';
-            document.getElementById('siteSettings').style.display = 'none';
-            document.getElementById('permissionsSettings').style.display = 'block';
-
-            const perms = JSON.parse(localStorage.getItem('mcore_permissions') || '{}');
-            const permList = document.getElementById('permList');
-            permList.innerHTML = '';
-
-            if(Object.keys(perms).length === 0) {
-                permList.innerHTML = '<p style="opacity:0.6;text-align:center;padding:20px;">لا توجد أذونات محفوظة بعد</p>';
-            } else {
-                for(let site in perms) {
-                    const div = document.createElement('div');
-                    div.className = 'perm-item';
-                    div.innerHTML = `
-                        <div class="perm-site">${site}</div>
-                        <div class="perm-row">
-                            <span>المايكروفون</span>
-                            <span class="${perms[site].mic? 'perm-allowed' : 'perm-blocked'}">${perms[site].mic? 'مسموح ✓' : 'محظور ✗'}</span>
-                        </div>
-                        <div class="perm-row">
-                            <span>الكاميرا</span>
-                            <span class="${perms[site].camera? 'perm-allowed' : 'perm-blocked'}">${perms[site].camera? 'مسموح ✓' : 'محظور ✗'}</span>
-                        </div>
-                        <div class="perm-row">
-                            <span>الموقع الجغرافي</span>
-                            <span class="${perms[site].location? 'perm-allowed' : 'perm-blocked'}">${perms[site].location? 'مسموح ✓' : 'محظور ✗'}</span>
-                        </div>
-                    `;
-                    permList.appendChild(div);
-                }
+            if (historyIndex < historyStack.length - 1) {
+                historyIndex++;
+                document.getElementById('frame').src = historyStack[historyIndex];
+                document.getElementById('urlBar').value = historyStack[historyIndex];
             }
         }
 
-        function closeSettings() {
-            localStorage.setItem('parentalMode', document.getElementById('parentalMode').checked);
-            localStorage.setItem('speedMode', document.getElementById('speedMode').checked);
-            localStorage.setItem('autoCorrect', document.getElementById('autoCorrect').checked);
-            document.getElementById('settingsModal').style.display = 'none';
-            showToast('تم حفظ الإعدادات ✓');
+        function reloadPage() {
+            document.getElementById('frame').src = document.getElementById('frame').src;
         }
 
-        function requestMic() {
-            if (isListening) {
-                recognition.stop();
-                return;
+        function goHome() {
+            document.getElementById('browserPage').style.display = 'none';
+            document.getElementById('homePage').style.display = 'flex';
+            document.getElementById('searchInput').value = '';
+        }
+
+        function showSearchSuggestions() {
+            const val = document.getElementById('searchInput').value.trim();
+            const box = document.getElementById('searchSuggestions');
+            if (!val) { box.style.display = 'none'; return; }
+
+            const suggestions = [
+                val + ' download',
+                val + ' apk',
+                val + ' للكمبيوتر',
+                val + ' شرح'
+            ];
+
+            box.innerHTML = suggestions.map(s => `<div class="suggestion-item" onclick="document.getElementById('searchInput').value='${s}'; searchGo()">${s}</div>`).join('');
+            box.style.display = 'block';
+        }
+
+        function hideSearchSuggestions() {
+            setTimeout(() => document.getElementById('searchSuggestions').style.display = 'none', 200);
+        }
+
+        // اختصار لوضع الأهل: دوس 5 مرات على اللوجو
+        let clickCount = 0;
+        document.querySelector('.logo').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount >= 5) {
+                let current = localStorage.getItem('parentalMode') === 'true';
+                localStorage.setItem('parentalMode',!current);
+                showToast(!current? 'تم تفعيل وضع الأهل 🔒' : 'تم إلغاء وضع الأهل 🔓');
+                clickCount = 0;
             }
-
-            if (!('webkitSpeechRecognition' in window) &&!('SpeechRecognition' in window)) {
-                showToast('المتصفح لا يدعم البحث الصوتي');
-                return;
-            }
-
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-            if (!recognition) {
-                recognition = new SpeechRecognition();
-                recognition.lang = 'ar-SA';
-                recognition.interimResults = false;
-                recognition.maxAlternatives = 1;
-
-                recognition.onstart = () => {
-                    isListening = true;
-                    document.getElementById('micIcon').classList.add('listening');
-                    showToast('اتكلم دلوقتي... 🎤');
-                };
-
-                recognition.onresult = (event) => {
-                    const speechResult = event.results[0][0].transcript;
-                    document.getElementById('searchInput').value = speechResult;
-                    showToast('تم: ' + speechResult);
-                    searchGo();
-                };
-
-                recognition.onerror = (event) => {
-                    if (event.error === 'not-allowed') {
-                        showToast('لازم تسمح للمايك من إعدادات الموبايل');
-                    } else {
-                        showToast('خطأ: ' + event.error);
-                    }
-                    stopListening();
-                };
-
-                recognition.onend = () => {
-                    stopListening();
-                };
-            }
-
-            recognition.start();
-        }
-
-        function stopListening() {
-            isListening = false;
-            document.getElementById('micIcon').classList.remove('listening');
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('permToast');
-            toast.textContent = msg;
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 2500);
-        }
-
-        window.onload = () => {
-            loadHistory();
-            if(localStorage.getItem('autoCorrect') === null) {
-                localStorage.setItem('autoCorrect', 'true');
-            }
-        }
-
-        window.onclick = (e) => {
-            if (e.target === document.getElementById('settingsModal')) closeSettings();
-        }
+            setTimeout(() => clickCount = 0, 2000);
+        });
     </script>
 </body>
 </html>
